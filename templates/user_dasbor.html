@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title title>Dashboard</title>
+            {% include 'layout/index.html' %}
+        </head>
+        <body class="hold-transition sidebar-mini layout-fixed">
+            {% include 'layout/navbar.html' %}
+            {% include 'layout/sidebar.html' %}
+            <div class="content-wrapper">
+                <section class="content-header">
+                    <div class="container-fluid">
+                        <div class="row mb-2">
+                            <div class="col-sm-6">
+                                <h1>Dashboard</h1>
+                            </div>  
+                        </div>
+                    </div>
+                </section>
+                <section class="content">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-6 col-6">
+                                <div class="small-box bg-info">
+                                    <div class="inner">
+                                        <h3>{{ result_csv }}</h3>
+                                        <p>Predict File</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fas fa-file-csv"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-6">
+                                <div class="small-box bg-success">
+                                    <div class="inner">
+                                        <h3>{{ result_text }}</h3>
+                                        <p>Predict Text</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fas fa-comment"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="padding-bottom: 1%; padding-top: 2%;" class="ml-2"><h4>New Histories</h4></div>
+                    <div class="timeline">
+                        {% for history in new_histories %}
+                            {% if history.filename_csv %}
+                            <div>
+                                <i class="fas fa-file-csv bg-info"></i>
+                                <div class="timeline-item">
+                                    <span class="time"><i class="fas fa-clock"></i> {{history.created_at}}</span>
+                                    <h3 class="timeline-header">Predict File</h3>
+                                    <div class="timeline-body">
+                                        file csv: <a href="{{ url_for('download_csv', filename=history.filename_csv) }}" download>{{ history.filename_csv }}</a>, The count of data in the CSV file: {{history.count_data}} data.<br>
+                                        <strong>Result:</strong>
+                                        <ol>
+                                            <li>The total of data successfully prediction: {{history.count_result}} data</li>
+                                            <li>Fix bug: {{history.count_data_0}} data</li>
+                                            <li>Feature Request: {{history.count_data_1}} data</li>
+                                            <li>Non-Informatif: {{history.count_data_2}} data</li>
+                                        </ol>
+                                        download result: <a href="{{ url_for('download_pdf', filename=history.filename_pdf) }}" download>{{history.filename_pdf}}</a>
+                                    </div>
+                                    <div class="timeline-footer">
+                                        <a class="btn btn-info btn-sm show-files" data-toggle="modal" data-target="#showFile" data-categori="{{history.category}}" data-app="{{history.name_app}}" data-csv="{{history.filename_csv}}" data-pdf="{{history.filename_pdf}}" data-result="{{history.count_result}}" data-count="{{history.count_data}}" data-0="{{history.count_data_0}}" data-1="{{history.count_data_1}}" data-2="{{history.count_data_2}}" data-time="{{history.created_at}}">
+                                            Read more
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div>
+                                <i class="fas fa-comments bg-green"></i>
+                                <div class="timeline-item">
+                                    <span class="time"><i class="fas fa-clock"></i> {{history.created_at}}</span>
+                                    <h3 class="timeline-header">Predict Text</h3>
+                                    <div class="timeline-body">
+                                        Review text: {{history.review_text}}<br>
+                                        {% if history.class == 0 %}
+                                            Result: Fix Bug
+                                        {% elif history.class == 1 %}
+                                            Result: Feature Request
+                                        {% else %}
+                                            Result: Non-Informatif
+                                        {% endif %}
+                                    </div>
+                                    <div class="timeline-footer">
+                                        <a class="btn btn-success btn-sm show-text" data-toggle="modal" data-target="#showText" data-categori="{{history.category}}" data-app="{{history.name_app}}" data-review="{{history.review_text}}" data-label="{{history.class}}" data-time="{{history.created_at}}">
+                                            Read more
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="modal fade" id="showFile" tabindex="-1" role="dialog" aria-labelledby="smallModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header bg-info">
+                                    <h5 class="modal-title" id="showHistory">Detail History</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <table class="table table-bordered table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Data</th>
+                                                <th>Content</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><strong>Category</strong></td>
+                                                <td id="history-category"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Name Apps</strong></td>
+                                                <td id="name_apps"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>File csv</strong></td>
+                                                <td id="file-csv"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>The count of data in the CSV file</strong></td>
+                                                <td id="count"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div><h5>Result Information</h5></div>
+                                    <table class="table table-bordered table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Data</th>
+                                                <th>Content</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><strong>Result</strong></td>
+                                                <td id="file-pdf"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>The total of data successfully prediction</strong></td>
+                                                <td id="count_result"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Fix Bug</strong></td>
+                                                <td id="fix-bug"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Feature Request</strong></td>
+                                                <td id="feature-request"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Non-Informatif</strong></td>
+                                                <td id="non-inf"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Time</strong></td>
+                                                <td id="created_at"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="showText" tabindex="-1" role="dialog" aria-labelledby="smallModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header bg-success">
+                                    <h5 class="modal-title" id="showText">Detail History</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <table class="table table-bordered table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Data</th>
+                                                <th>Content</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><strong>Category</strong></td>
+                                                <td id="history-category"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Name Apps</strong></td>
+                                                <td id="name_apps"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Review Text</strong></td>
+                                                <td id="review_text"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Result</strong></td>
+                                                <td id="result"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Created at</strong></td>
+                                                <td id="created_at"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <script>
+                $(document).on('click', '.show-files', function() {
+                    var categoryName = $(this).data('categori');
+                    var nameApps = $(this).data('app');
+                    var fileCsv = $(this).data('csv');
+                    var filePdf = $(this).data('pdf');
+                    var count = $(this).data('count');
+                    var result = $(this).data('result');
+                    var count0 = $(this).data('0');
+                    var count1 = $(this).data('1');
+                    var count2 = $(this).data('2');
+                    var createdAt = $(this).data('time');
+    
+                    $('#showFile').find('#history-category').text(categoryName);
+                    $('#showFile').find('#name_apps').text(nameApps);
+                    $('#showFile').find('#file-csv').text(fileCsv);
+                    $('#showFile').find('#count').text(count);
+                    $('#showFile').find('#file-pdf').text(filePdf);
+                    $('#showFile').find('#count_result').text(result);
+                    $('#showFile').find('#fix-bug').text(count0);
+                    $('#showFile').find('#feature-request').text(count1);
+                    $('#showFile').find('#non-inf').text(count2);
+                    $('#showFile').find('#created_at').text(createdAt);
+                });
+
+                $(document).on('click', '.show-text', function() {
+                    var categoryName = $(this).data('categori');
+                    var nameApps = $(this).data('app');
+                    var reviewText = $(this).data('review');
+                    var classLabel = $(this).data('label');
+                    var createdAt = $(this).data('time');
+                    
+                    var labelName = '';
+                    if (classLabel == 0) {
+                        labelName = 'Fix Bug';
+                    } else if (classLabel == 1) {
+                        labelName = 'Feature Request';
+                    } else if (classLabel == 2) {
+                        labelName = 'Non-Informatif';
+                    }
+    
+                    $('#showText').find('#history-category').text(categoryName);
+                    $('#showText').find('#name_apps').text(nameApps);
+                    $('#showText').find('#review_text').text(reviewText);
+                    $('#showText').find('#result').text(labelName);
+                    $('#showText').find('#created_at').text(createdAt);
+                });
+            </script>
+        </body>
+    </html>       

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title title>Prediction</title>
+            {% include 'layout/index.html' %}
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw==" crossorigin="anonymous"/>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" integrity="sha512-2ImtlRlf2VVmiGZsjm9bEyhjGW4dU7B6TNwh/hx/iSByxNENtj3WVE6o/9Lj4TJeVXPi4bnOIMXFIJJAeufa0A==" crossorigin="anonymous"></script>
+        </head>
+        <body class="hold-transition sidebar-mini layout-fixed">
+            {% include 'layout/navbar.html' %}
+            {% include 'layout/sidebar.html' %}
+            <div class="content-wrapper">
+                <section class="content-header">
+                    <div class="container-fluid">
+                        <div class="row mb-2">
+                            <div class="col-sm">
+                                <h1>Prediction Indonesian Text</h1>
+                            </div>  
+                        </div>
+                    </div>
+                </section>
+                <section class="content">
+                    <div class="container-fluid">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                        <h6>{{ message }}</h6>
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                        <!-- <div class="callout callout-warning" style="background-color: rgb(255, 249, 202);">
+                            <h5>The accuracy of this system to prediction is {{accuracy}}</h5>
+                        </div> -->
+                        <div class="card card-primary card-outline">
+                            <div class="card-header">
+                                <ul class="nav nav-tabs" id="custom-tab" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" id="predict-text" data-toggle="pill" href="#predict_text" role="tab" aria-controls="predict-text" aria-selected="true">Predict Text</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="predict-file" data-toggle="pill" href="#predict_file" role="tab" aria-controls="predict-file" aria-selected="false">Predict File</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card-body">
+                                <div class="tab-content" id="custom-tabContent">
+                                    <div class="tab-pane fade show active" id="predict_text" role="tabpanel" aria-labelledby="predict-text">
+                                        <form action="{{url_for('predict_indo')}}" method="post">
+                                            <div class="form-group row">
+                                                <label for="category_id" class="col-sm-2 col-form-label">category</label>
+                                                <div class="col-sm-10">
+                                                    <select class="form-control select2" id="category_id" name="category_id" required>
+                                                        {% for categories in category %}
+                                                        <option name="category_id" value="{{ categories.id }}"
+                                                            {% if categories.id|string == category_id|string %}selected{% endif %}>
+                                                            {{ categories.category }} 
+                                                       <!--
+                                                        ini ori dari code lama
+                                                       <option name="category_id" value="{{ categories.id }}">{{ categories.category }}</option> 
+                                                        -->
+                                                            {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="name_apps" class="col-sm-2 col-form-label">Name Apps</label>
+                                                <div class="col-sm-10">
+                                                    <input type="text" class="form-control" id="name_apps" name="name_app" value="{{ name_apps or '' }}" minlength="3" maxlength="50" autocomplete="off" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="review" class="col-sm-2 col-form-label">Text Review</label>
+                                                <div class="col-sm-10">
+                                                    <textarea class="form-control" rows="2" id="review" name="review_text" autocomplete="off" required>{{ review_text or '' }}</textarea>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label class="col-sm-2 col-form-label">Result</label>
+                                                <div class="col-sm-10">
+                                                <input class="form-control" value="{{ prediction_text or '(no predictions yet)' }}" readonly>
+                                                </div>
+                                            </div>
+                                            <p class="text-danger" style="padding-left: 17%;">*Please press button clear after prediction</p>
+                                            {% if session['level'] == 'Admin' : %}
+                                                <button type="button" class="btn btn-success float-right" data-toggle="modal" data-target="#save_predict">
+                                                    Save
+                                                </button>
+                                            {% endif %}
+                                            <a href="{{ url_for('prediction_indo') }}" class="btn btn-danger float-right mr-2">Clear</a>
+                                            <button type="submit" class="btn btn-primary float-right mr-2">Predict</button>
+                                        </form>
+                                        <div class="modal fade" id="save_predict" tabindex="-1" role="dialog" aria-labelledby="smallModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header bg-primary">
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="mb-3 float-center">
+                                                            <strong><h4>Do you want to save this data?</h4></strong>
+                                                        </div>
+                                                        <form action="{{url_for('savePredict_indo')}}" method="post">
+                                                            <div class="form-group row">
+                                                                <label for="category_id" class="col-sm-3 col-form-label">Category</label>
+                                                                <div class="col-sm-9">
+                                                                    <input type="text" class="form-control" id="category_id" name="category_id" value="{{ category_id }}" hidden>
+                                                                    <input class="form-control" value="{{ category_name }}" readonly>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <label for="review_text" class="col-sm-3 col-form-label">Review Text</label>
+                                                                <div class="col-sm-9">
+                                                                    <input type="text" class="form-control" id="review_text" name="review_text" value="{{ review_text }}" readonly>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <label for="class" class="col-sm-3 col-form-label">Result</label>
+                                                                <div class="col-sm-9">
+                                                                    <input type="text" class="form-control" id="class" name="class" value="{{ prediction_text }}" hidden>
+                                                                    <input class="form-control" value="{{ prediction_text }}" readonly>
+                                                                </div>
+                                                            </div>
+                                                            <button type="submit" class="btn btn-primary float-right">Save</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="predict_file" role="tabpanel" aria-labelledby="predict-file">
+                                        <form action="{{url_for('scanFile_indo')}}" method="post" enctype="multipart/form-data">
+                                            <div class="form-group row">
+                                                <label for="review" class="col-sm-2 col-form-label">Upload File CSV</label>
+                                                <div class="col-sm-10">
+                                                    <div class="input-group">
+                                                        <div class="custom-file">
+                                                            <input class="custom-file-input" type="file" id="fileInput" onchange="showFileName()" name="file" required>
+                                                            <label id="fileNameLabel" class="custom-file-label" for="fileInput"></label>
+                                                        </div>
+                                                        <button type="submit" value="pindai" class="btn btn-warning float-right">Scan</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                        <form action="{{url_for('predictFile_indo')}}" method="post" enctype="multipart/form-data">
+                                            <p class="text-secondary" style="padding-left: 17%;">*After upload file CSV, please press button scan</p>
+                                            <div class="form-group row">
+                                                <label for="category_id" class="col-sm-2 col-form-label">Category</label>
+                                                <div class="col-sm-10">
+                                                    <select class="form-control select2" id="category" name="category_id" required style="width: 100%;">
+                                                        {% for categories in category %}
+                                                            <option name="category_id" value="{{ categories.id }}">{{ categories.category }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="name_apps" class="col-sm-2 col-form-label">Name Apps</label>
+                                                <div class="col-sm-10">
+                                                    <input type="text" class="form-control" id="name_apps" name="name_app" value="" minlength="3" maxlength="20" autocomplete="off" required>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="column" class="col-sm-2 col-form-label">Select Column</label>
+                                                <div class="col-sm-10">
+                                                    <select class="form-control select2" id="column" name="column" required style="width: 100%;">
+                                                        {% for kolom in columns %}
+                                                            <option name="column" value="{{kolom}}">{{ kolom }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <input type="text" class="form-control" id="file" name="file_csv" value="{{filename}}" hidden>
+                                            <p class="text-danger" style="padding-left: 17%;">*Please press button clear after prediction</p>
+                                            <a href="{{ url_for('prediction_indo') }}" class="btn btn-danger float-right">Clear</a>
+                                            <button type="submit" value="upload" class="btn btn-primary float-right mr-2">Predict</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <script>
+                $(document).ready(function () {
+                    $('.select2').select2({
+                        theme: 'bootstrap4',
+                    });
+
+                    $('a[data-toggle="pill"]').on('shown.bs.tab', function(e) {
+                        localStorage.setItem('activeTab', $(e.target).attr('href'));
+                    });
+
+                    var activeTab = localStorage.getItem('activeTab');
+                    if (activeTab) {
+                        $('a[data-toggle="pill"][href="' + activeTab + '"]').tab('show');
+                    } else {
+                        $('a[data-toggle="pill"]').first().tab('show');
+                    }
+
+                    $('#fileInput').on('change', function() {
+                        var fileName = $(this).val().split('\\').pop();
+                        $('#fileNameLabel').text(fileName);
+                    });
+
+                    function saveValue() {
+                        var value = document.getElementById('name_apps').value;
+                        var nameApps = value;
+                        document.getElementById('name_apps').value = nameApps;
+                    }
+                });
+            </script>
+        </body>
+    </html>

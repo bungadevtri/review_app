@@ -1,0 +1,94 @@
+<aside class="main-sidebar sidebar-light-primary elevation-4"">
+    <div class="sidebar">
+        <a class="brand-link">
+            <img src="{{ url_for('static', filename='logoblue.png')}}" class="brand-image  mr-3" >
+            <span class="brand-text font-weight-normal">Get Prediction</span>
+        </a>
+        <nav class="mt-3">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                {% if session['level'] == 'Admin' : %}
+                <li class="nav-item mb-1">
+                    <a href="{{url_for('adminDashboard')}}" class="nav-link">
+                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <p >Dashboard</p>
+                    </a>
+                </li>
+                <li class="nav-item mb-1">
+                    <a href="{{url_for('classification')}}" class="nav-link">
+                        <i class="nav-icon fas fa-file"></i>
+                        <p>Data Reviews</p>
+                    </a>
+                </li>
+                <li class="nav-item mb-1">
+                    <a href="{{url_for('category')}}" class="nav-link">
+                        <i class="nav-icon fas fa-bookmark"></i>
+                        <p>Category</p>
+                    </a>                    
+                </li>
+                <li class="nav-item mb-1">
+                    <a href="{{url_for('managementAccount')}}" class="nav-link">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p>Management Account </p>
+                    </a>
+                </li>
+                {% else %}
+                <li class="nav-item mb-1">
+                    <a href="{{url_for('dashboard')}}" class="nav-link">
+                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <p>Dashboard</p>
+                    </a>
+                </li>
+                {% endif %}
+                <li class="nav-item mb-1">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-search"></i>
+                        <p>Prediction</p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{url_for('prediction')}}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>English</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{url_for('prediction_indo')}}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Indonesia</p>
+                            </a>
+                        </li>
+                         <li class="nav-item">
+                            <a href="{{url_for('prediction_multilanguage')}}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Multilanguage</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item mb-1">
+                    <a href="{{url_for('history')}}" class="nav-link">
+                        <i class="nav-icon fas fa-hourglass-half"></i>
+                        <p>History</p>
+                    </a>
+                </li>
+                <li class="nav-item mb-1">
+                    <a href="{{url_for('myAccount')}}" class="nav-link">
+                        <i class="nav-icon fas fa-user"></i>
+                        <p>My Account</p>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</aside>
+<script>
+    var url = window.location;
+
+    $('ul.nav-sidebar a').filter(function() {
+        return this.href == url;
+    }).addClass('active');
+
+    $('ul.nav-treeview a').filter(function() {
+        return this.href == url;
+    }).parentsUntil(".nav-sidebar > .nav-treeview").addClass('menu-open').prev('a').addClass('active');
+</script>

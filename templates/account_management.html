@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title title>Management Account</title>
+            <link rel="stylesheet" type="text/css"
+                href="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.24/b-1.7.0/b-colvis-1.7.0/b-html5-1.7.0/b-print-1.7.0/fc-3.3.2/fh-3.1.8/kt-2.6.1/r-2.2.7/rg-1.1.2/sc-2.0.3/sb-1.0.1/sp-1.2.2/sl-1.3.3/datatables.min.css" />
+            <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.24/b-1.7.0/b-colvis-1.7.0/b-html5-1.7.0/b-print-1.7.0/fc-3.3.2/fh-3.1.8/kt-2.6.1/r-2.2.7/rg-1.1.2/sc-2.0.3/sb-1.0.1/sp-1.2.2/sl-1.3.3/datatables.min.js"></script>
+            
+            {% include 'layout/index.html' %}
+        </head>
+        <body class="hold-transition sidebar-mini layout-fixed">
+            {% include 'layout/navbar.html' %}
+            {% include 'layout/sidebar.html' %}
+            <div class="content-wrapper">
+                <section class="content-header">
+                    <div class="container-fluid">
+                        <div class="row mb-2">
+                            <div class="col-sm-6">
+                                <h1>Management Account</h1>
+                            </div>  
+                        </div>
+                    </div>
+                </section>
+                <section class="content">
+                    <div class="container-fluid">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                        <h6>{{ message }}</h6>
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                        <div class="row">
+                            <div class="col-md-7">
+                                <div class="card card-primary card-outline">
+                                    <form method="POST" action="{{url_for('deleteUser')}}">
+                                        <div class="card-header d-flex">
+                                            <div class="mt-2"><h5>Data Account</h5></div>
+                                            <div class="card-tools ml-auto mr-1">
+                                                <input type="submit" value="Delete All Selected" class="btn btn-danger">
+                                            </div>
+                                        </div>
+                                         
+                                        <div class="card-body">
+                                            <table id="tb_user" class="table table-bordered table-striped table-hover datatable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th><input type="checkbox" id="checkall"></th>
+                                                        <th>Username</th>
+                                                        <th>Email</th>
+                                                        <th>Category</th>
+                                                        <th>Created at</th>
+                                                        <th>Updated at</th>
+                                                        <th>Last Login at</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>     
+                                                <tbody>
+                                                    {% for user in users %}
+                                                        <tr>
+                                                            <td>{{loop.index}}</td>
+                                                            <td><input type="checkbox" value="{{user.id}}" name="delete_checkbox"></td>
+                                                            <td>{{ user.username }}</td>
+                                                            <td>{{ user.email }}</td>
+                                                            <td>{{ user.level }}</td>
+                                                            <td>{{ user.created_at }}</td>
+                                                            <td>{{ user.updated_at }}</td>
+                                                            <td>{{ user.last_login }}</td>
+                                                            <td><a class="btn btn-info btn-sm update-button" data-toggle="modal" data-target="#update_users" data-id="{{ user.id }}" data-username="{{user.username}}" data-email="{{user.email}}" title="Change Profil">
+                                                                Change Profil <i class="fas fa-pen ml-1"></i></a> &nbsp;
+                                                                <a class="btn btn-warning btn-sm change-pass" data-toggle="modal" data-target="#update_pass" data-id="{{ user.id }}" data-password="{{user.password}}" title="Change Password" style="color: white;">
+                                                                    Change Password <i class="fas fa-lock ml-1"></i></a> &nbsp;
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="card card-success card-outline">
+                                    <div class="card-header">
+                                        <h5 class="mt-2">Create New Account</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form action="{{url_for('addUser')}}" method="post">
+                                            <div class="mb-3">
+                                                <label for="username" class="form-label">Username</label>
+                                                <input type="text" class="form-control" id="username" placeholder="username" name="username" minlength="4" maxlength="15" autocomplete="off" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="email" class="form-label">Email</label>
+                                                <input type="email" class="form-control" id="email" placeholder="email" name="email" autocomplete="off" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="password" class="form-label">Password</label>
+                                                <input type="password" class="form-control" id="password" placeholder="password" name="password" minlength="8" maxlength="10" autocomplete="off" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="level" class="form-label">As</label>
+                                                <input type="text" class="form-control" id="level" value="Developer" readonly>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="created_by" class="form-label">Created By</label>
+                                                <input type="text" class="form-control" value="{{ session['username'] }}" readonly>
+                                            </div>
+                                            <button type="submit" class="btn btn-success">Create</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal fade" id="update_users" tabindex="-1" role="dialog" aria-labelledby="smallModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-info">
+                                            <h5 class="modal-title" id="update_users">Change User Account</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form action="{{url_for('changeUser')}}" method="post">
+                                                <div class="mb-3">
+                                                    <label for="username" class="form-label">Username</label>
+                                                    <input type="text" class="form-control" id="user-name" name="username" value="" minlength="4" maxlength="15" autocomplete="off" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="email" class="form-label">Email</label>
+                                                    <input type="email" class="form-control" id="user-email" name="email" value="" autocomplete="off" required>
+                                                </div>
+                                                <input class="form-control" id="user-id" name="id" value="" hidden>
+                                                <button type="submit" class="btn btn-info">Change</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal fade" id="update_pass" tabindex="-1" role="dialog" aria-labelledby="smallModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-warning">
+                                            <h5 class="modal-title" id="update_pass">Change User Password</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form action="{{url_for('changePassword')}}" method="post">
+                                                <div class="mb-3">
+                                                    <label for="password_old" class="form-label">Old Password</label>
+                                                    <input type="password" class="form-control" id="user-pass" value="" readonly>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="password_new" class="form-label">New Password</label>
+                                                    <input type="password" class="form-control" id="user-pass" name="password" value="" minlength="8" maxlength="10" autocomplete="off" required>
+                                                </div>
+                                                <input class="form-control" id="user-id" name="id" value="" hidden>
+                                                <button type="submit" class="btn btn-warning">Change</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    $('#tb_user').DataTable({
+                        order: [0, 'asc'],
+                        responsive: true
+                    });
+
+                    $("#checkall").click(function(){
+                        if($(this).is(':checked')) {
+                            $("#tb_user input[type=checkbox]").each(function() {
+                                $(this).prop("checked", true);
+                            });
+                        }else{
+                            $("#tb_user input[type=checkbox]").each(function() {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    });
+                    $("[data-toggle=tooltip]").tooltip();
+
+                });
+
+                $(document).on('click', '.update-button', function() {
+                    var userId = $(this).data('id');
+                    var userName = $(this).data('username');
+                    var userEmail = $(this).data('email');
+    
+                    $('#update_users').find('#user-id').val(userId);
+                    $('#update_users').find('#user-name').val(userName);
+                    $('#update_users').find('#user-email').val(userEmail);
+                });
+
+                $(document).on('click', '.change-pass', function() {
+                    var userId = $(this).data('id');
+                    var userPass = $(this).data('password');
+    
+                    $('#update_pass').find('#user-id').val(userId);
+                    $('#update_pass').find('#user-pass').val(userPass);
+                });
+            </script>
+        </body>
+    </html>       

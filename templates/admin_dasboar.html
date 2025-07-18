@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title title>Dashboard</title>
+    {% include 'layout/index.html' %}
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+    {% include 'layout/navbar.html' %}
+    {% include 'layout/sidebar.html' %}
+    <div class="content-wrapper">
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Dashboard</h1>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-info">
+                            <div class="inner">
+                                <h3>{{result_review}}</h3>
+                                <p>Data Reviews</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-folder"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-danger">
+                            <div class="inner">
+                                <h3>{{ result_fix_bug }}</h3>
+                                <p>Data Fix Bug</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-exclamation"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-warning">
+                            <div class="inner" style="color: white;">
+                                <h3>{{ result_feature_request  }}</h3>
+                                <p>Data Feature Request</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-success">
+                            <div class="inner">
+                                <h3>{{ result_noninformatif  }}</h3>
+                                <p>Data Non-Informatif</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-comment"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card card-danger card-outline">
+                            <div class="card-header">
+                                <h3 class="card-title">Fix Bug Chart</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chartjs-size-monitor">
+                                    <div class="chartjs-size-monitor-expand">
+                                        <div class=""></div>
+                                    </div>
+                                    <div class="chartjs-size-monitor-shrink">
+                                        <div class=""></div>
+                                    </div>
+                                </div>
+                                <canvas id="fixChart"
+                                    style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block; width: 508px;"
+                                    width="762" height="375" class="chartjs-render-monitor"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card card-warning card-outline">
+                            <div class="card-header">
+                                <h3 class="card-title">Feature Request Chart</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chartjs-size-monitor">
+                                    <div class="chartjs-size-monitor-expand">
+                                        <div class=""></div>
+                                    </div>
+                                    <div class="chartjs-size-monitor-shrink">
+                                        <div class=""></div>
+                                    </div>
+                                </div>
+                                <canvas id="requestChart"
+                                    style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block; width: 508px;"
+                                    width="762" height="375" class="chartjs-render-monitor"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card card-success card-outline">
+                            <div class="card-header">
+                                <h3 class="card-title">Non-Informatif Chart</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chartjs-size-monitor">
+                                    <div class="chartjs-size-monitor-expand">
+                                        <div class=""></div>
+                                    </div>
+                                    <div class="chartjs-size-monitor-shrink">
+                                        <div class=""></div>
+                                    </div>
+                                </div>
+                                <canvas id="noninfChart"
+                                    style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block; width: 508px;"
+                                    width="762" height="375" class="chartjs-render-monitor"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '/fixBugChart',
+                method: 'GET',
+                success: function (response) {
+                    var data = response.counts;
+                    var labels = response.categories;
+                    var dataFix = {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: ['#6e1e12', '#a92d1a', '#ce3017',
+                                '#55261f', '#a05042', '#c78275'
+                            ],
+                        }]
+                    }
+
+                    var option = {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                    }
+                    var fixBug = $('#fixChart').get(0).getContext('2d')
+                    new Chart(fixBug, {
+                        type: 'doughnut',
+                        data: dataFix,
+                        options: option
+                    })
+                }
+            });
+
+            $.ajax({
+                url: '/featureRequestChart',
+                method: 'GET',
+                success: function (response) {
+                    var data_req = response.counts;
+                    var labels_req = response.categories;
+                    var dataReq = {
+                        labels: labels_req,
+                        datasets: [{
+                            data: data_req,
+                            backgroundColor: ['#935f1a', '#c59658', '#f39c12',
+                                '#d48e34', '#f98f04', '#c7a321'
+                            ],
+                        }]
+                    }
+
+                    var option = {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                    }
+                    var featureRequest = $('#requestChart').get(0).getContext('2d')
+                    new Chart(featureRequest, {
+                        type: 'doughnut',
+                        data: dataReq,
+                        options: option
+                    })
+                }
+            });
+
+            $.ajax({
+                url: '/nonInforChart',
+                method: 'GET',
+                success: function (response) {
+                    var data_noninf = response.counts;
+                    var labels_noninf = response.categories;
+                    var dataNonInfo = {
+                        labels: labels_noninf,
+                        datasets: [{
+                            data: data_noninf,
+                            backgroundColor: ['#023614', '#1b4d2c', '#13612d',
+                                '#0d8435', '#05ad3d', '#508863'
+                            ],
+                        }]
+                    }
+
+                    var option = {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                    }
+                    var featureRequest = $('#noninfChart').get(0).getContext('2d')
+                    new Chart(featureRequest, {
+                        type: 'doughnut',
+                        data: dataNonInfo,
+                        options: option
+                    })
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

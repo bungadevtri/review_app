@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title title>Data Reviews</title>
+            <link rel="stylesheet" type="text/css"
+                href="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.24/b-1.7.0/b-colvis-1.7.0/b-html5-1.7.0/b-print-1.7.0/fc-3.3.2/fh-3.1.8/kt-2.6.1/r-2.2.7/rg-1.1.2/sc-2.0.3/sb-1.0.1/sp-1.2.2/sl-1.3.3/datatables.min.css" />
+            <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.24/b-1.7.0/b-colvis-1.7.0/b-html5-1.7.0/b-print-1.7.0/fc-3.3.2/fh-3.1.8/kt-2.6.1/r-2.2.7/rg-1.1.2/sc-2.0.3/sb-1.0.1/sp-1.2.2/sl-1.3.3/datatables.min.js"></script>
+            {% include 'layout/index.html' %}
+        </head>
+        <body class="hold-transition sidebar-mini layout-fixed">
+            {% include 'layout/navbar.html' %}
+            {% include 'layout/sidebar.html' %}
+            <div class="content-wrapper">
+                <section class="content-header">
+                    <div class="container-fluid">
+                        <div class="row mb-2">
+                            <div class="col-sm-6">
+                                <h1>Data Reviews</h1>
+                            </div>  
+                        </div>
+                    </div>
+                </section>
+                <section class="content">
+                    <div class="container-fluid">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                        <h6>{{ message }}</h6>
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                        <div class="card card-primary card-outline">
+                            <form method="post" action="{{ url_for('deleteClassification') }}">
+                                <div class="card-header d-flex">
+                                    <div class="mt-2"><h5>Data Classification</h5></div>
+                                    <div class="card-tools ml-auto mr-1">
+                                        <input type="submit" value="Delete All Selected" class="btn btn-danger">
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <table id="tb_data_training" class="table table-bordered table-striped table-hover datatable">
+                                        <thead>
+                                            <tr>
+                                                <th><input type="checkbox" id="checkall"></th>
+                                                <th>Teks Review</th>
+                                                <th>Category</th>
+                                                <th>Class</th>
+                                                <th>Created at</th>
+                                                <th>Added by</th>
+                                            </tr>
+                                        </thead>     
+                                        <tbody>
+                                            {% for data_reviews in data_review %}
+                                                <tr>
+                                                    <td><input type="checkbox" value="{{data_reviews.id}}" name="id"></td>
+                                                    <td>{{ data_reviews.review_text }}</td>
+                                                    <td>{{data_reviews.category}}</td>
+                                                    <td>{% if data_reviews.class == 0 %}
+                                                            Fix Bug
+                                                            {% elif data_reviews.class == 1 %}
+                                                            Feature Request
+                                                            {% else %}
+                                                            Non-Informatif
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{data_reviews.created_at}}</td>
+                                                    <td>{{data_reviews.username}}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <script>
+                $(document).ready(function(){
+                    $('#tb_data_training').DataTable({
+                        order: [0, 'asc'],
+                        responsive: true
+                    });
+
+                    $("#checkall").click(function(){
+                        if($(this).is(':checked')) {
+                            $("#tb_data_training input[type=checkbox]").each(function() {
+                                $(this).prop("checked", true);
+                            });
+                        }else{
+                            $("#tb_data_training input[type=checkbox]").each(function() {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    });
+                    $("[data-toggle=tooltip]").tooltip();
+                });
+            </script>
+        </body>
+    </html>       

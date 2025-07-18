@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+    <html lang="en">
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title title>Category</title>
+            <link rel="stylesheet" type="text/css"
+                href="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.24/b-1.7.0/b-colvis-1.7.0/b-html5-1.7.0/b-print-1.7.0/fc-3.3.2/fh-3.1.8/kt-2.6.1/r-2.2.7/rg-1.1.2/sc-2.0.3/sb-1.0.1/sp-1.2.2/sl-1.3.3/datatables.min.css" />
+            <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.24/b-1.7.0/b-colvis-1.7.0/b-html5-1.7.0/b-print-1.7.0/fc-3.3.2/fh-3.1.8/kt-2.6.1/r-2.2.7/rg-1.1.2/sc-2.0.3/sb-1.0.1/sp-1.2.2/sl-1.3.3/datatables.min.js"></script>
+            
+            {% include 'layout/index.html' %}
+        </head>
+        <body class="hold-transition sidebar-mini layout-fixed">
+            {% include 'layout/navbar.html' %}
+            {% include 'layout/sidebar.html' %}
+            <div class="content-wrapper">
+                <section class="content-header">
+                    <div class="container-fluid">
+                        <div class="row mb-2">
+                            <div class="col-sm-6">
+                                <h1>Category Application</h1>
+                            </div>  
+                        </div>
+                    </div>
+                </section>
+                <section class="content">
+                    <div class="container-fluid">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                                            {% if messages %}
+                                                {% for category, message in messages %}
+                                                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                                        <h6>{{ message }}</h6>
+                                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                {% endfor %}
+                                            {% endif %}
+                                        {% endwith %}
+                        <div class="row">
+                            <div class="col-md-7">
+                                <div class="card card-primary card-outline">
+                                    <form method="POST" action="{{url_for('deleteCategory')}}">
+                                        <div class="card-header d-flex">
+                                            <div class="mt-2"><h5>Data Category Application</h5></div>
+                                            <div class="card-tools ml-auto mr-1">
+                                                <input type="submit" value="Delete All Selected" class="btn btn-danger">
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <table id="tb_category" class="table table-bordered table-striped table-hover datatable">
+                                                <thead>
+                                                    <tr>
+                                                        <th><input type="checkbox" id="checkall"></th>
+                                                        <th >Category</th>
+                                                        <th>Created at</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>     
+                                                <tbody>
+                                                    {% for category in categories %}
+                                                        <tr>
+                                                            <td><input type="checkbox" value="{{category.id}}" name="delete_checkbox"></td>
+                                                            <td class="category-name">{{ category.category }}</td>
+                                                            <td>{{ category.created_at }}</td>
+                                                            
+                                                                <td>
+                                                                    <center>
+                                                                    <a class="btn btn-primary btn-sm update-link" data-toggle="modal" data-target="#update_category" data-category-id="{{ category.id }}" title="update">
+                                                                        <i class="fas fa-pen"></i>
+                                                                    </a> &nbsp;
+                                                                </center>
+                                                                </td>
+                                                            
+                                                            
+                                                        </tr>
+                                                        {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="card card-success card-outline">
+                                    <div class="card-header">
+                                        <h5 class="mt-2">Create New Category</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form action="{{url_for('createCategory')}}" method="post">
+                                            <div class="mb-3">
+                                                <label for="category" class="form-label">Category</label>
+                                                <input type="text" class="form-control" id="category" placeholder="category" name="category" autocomplete="off" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="created_by" class="form-label">Created By</label>
+                                                <input type="text" class="form-control" value="{{ session['username'] }}" readonly>
+                                            </div>
+                                            <button type="submit" class="btn btn-success">Create</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal fade" id="update_category" tabindex="-1" role="dialog" aria-labelledby="smallModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-primary">
+                                        <h5 class="modal-title" id="create_category">Update Category Application</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="{{url_for('updateCategory')}}" method="post">
+                                            <div class="mb-3">
+                                                <label for="category" class="form-label">Category</label>
+                                                <input type="text" class="form-control" id="category-name" name="category_name" value="" autocomplete="off" required>
+                                            </div>
+                                            <input type="hidden" id="category-id" name="category_id" value="">
+                                            <button type="submit" class="btn btn-primary">Update</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <script>
+               $(document).ready(function() {
+                    $('#tb_category').DataTable({
+                        order: [0, 'asc'],
+                        responsive: true
+                    });
+
+                    $("#checkall").click(function(){
+                        if($(this).is(':checked')) {
+                            $("#tb_category input[type=checkbox]").each(function() {
+                                $(this).prop("checked", true);
+                            });
+                        }else{
+                            $("#tb_category input[type=checkbox]").each(function() {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    });
+                    $("[data-toggle=tooltip]").tooltip();
+
+                    $('.update-link').click(function(e) {
+                        e.preventDefault();
+                        var categoryId = $(this).data('category-id');
+                        var categoryName = $(this).closest('tr').find('.category-name').text();
+                        $('#category-id').val(categoryId);
+                        $('#category-name').val(categoryName);
+                    });
+                });
+            </script>
+        </body>
+    </html>       
