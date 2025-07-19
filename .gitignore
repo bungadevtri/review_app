@@ -3,5 +3,4 @@
 *.pkl
 *.csv
 *.sql
-
 __pycache__/
