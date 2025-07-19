@@ -27,10 +27,24 @@ nltk.download('stopwords')
 import torch
 import torch.nn as nn
 from transformers import BertTokenizer, BertModel
+import mysql.connector
 
 app = Flask(__name__)
 
+# Railway environment configuration
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB limit
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-here')
 
+# Database configuration for Railway
+def get_db_connection():
+    config = {
+        'host': os.environ.get('MYSQLHOST', 'localhost'),
+        'user': os.environ.get('MYSQLUSER', 'root'),
+        'password': os.environ.get('MYSQLPASSWORD', ''),
+        'database': os.environ.get('MYSQLDATABASE', 'reviewclassification'),
+        'port': int(os.environ.get('MYSQLPORT', 3306))
+    }
+    return mysql.connector.connect(**config)
 
 app.secret_key = 'bismillahjuli2024'
 app.config['MYSQL_HOST'] = 'localhost'
@@ -1046,7 +1060,7 @@ def predict_multilanguage():
         return render_template('prediction_multilanguage.html', prediction_text=prediction_text, review_text=text, category_id=category, category_name=category_name, name_apps=name_apps, accuracy=formatted_accuracy)
     else:
         return redirect(url_for('prediction_multilanguage'))
-    
+
 @app.route('/savePredict_multilanguage', methods=['POST'])
 def savePredict_multilanguage():
     if request.method == 'POST':
@@ -1524,6 +1538,8 @@ def download_pdf(filename):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    debug_mode = os.environ.get('FLASK_ENV') != 'production'
+    app.run(host='0.0.0.0', port=port, debug=debug_mode)
 
 
