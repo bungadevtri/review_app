@@ -1,4 +1,6 @@
 *.keras
 *.pt
 *.pkl
+*.joblib
+*.h5
 __pycache__/
