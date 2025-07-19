@@ -1,6 +1,7 @@
-*.keras
 *.pt
-*.pkl
-*.joblib
 *.h5
+*.pkl
+*.csv
+*.sql
+
 __pycache__/
